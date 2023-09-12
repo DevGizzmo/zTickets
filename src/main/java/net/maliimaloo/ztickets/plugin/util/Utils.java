@@ -1,4 +1,4 @@
-package net.eaglemc.eagleduel.plugin.util;
+package net.maliimaloo.ztickets.plugin.util;
 
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -20,6 +20,10 @@ public final class Utils {
         if (paramString == null || paramString.isEmpty() || paramString.equals("none"))
             return true;
         return !(paramSender instanceof Player) || paramSender.hasPermission(paramString) || paramSender.isOp();
+    }
+
+    public static boolean hasTitle(String paramString) {
+        return paramString != null && !paramString.isEmpty() && !paramString.equalsIgnoreCase("none");
     }
 
     /**

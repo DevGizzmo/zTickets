@@ -1,0 +1,80 @@
+# ---------------------------------------------
+# Ne pas modifier la valeur de Version.
+# ---------------------------------------------
+Version: 1
+
+No_Permission: "&cVous n'avez pas la permissions suffisantes pour utiliser ceci. &7(&b{permission}&7)"
+
+Player:
+  Not_Online: "&cLe joueur &b{target_player} &cn'est pas en ligne sur le serveur."
+  Use_Ticket: "&fVous venez d'utiliser &ax{amount} {ticket_id}-{ticket_name}&f."
+  Not_Win_Reward: "&cVous n'avez rien gagner."
+
+Commands:
+  Invalid_Argument: "&cArgument invalide. Exécutez '&6/{label} ?&c' pour l'aide."
+  Invalid_Number: "&cLe nombre doit être un nombre entier ou un nombre décimal. Obtenu : '&6{input}&c'"
+  Reload_Started: "Reloading plugin's data, veuillez attendre..."
+  Reload_Success: "&6{plugin_name} {plugin_version} viens de reload."
+  Reload_File_Load_Error: "&4Oups, &cvoici un problème lors du chargement des fichiers à partir de votre disque ! Voir la console pour plus d'informations. {plugin_name} n'a pas été rechargé.";
+  Reload_Fail: "&4Oups, &céchec du chargement ! Consultez la console pour plus d'informations. Erreur : {error}"
+
+  MainCommand:
+    no_param_header:
+      - "*---------------------------------------------------*"
+      - "&fEn cours d'exécution &czTickets &f{plugin_version}"
+      - "&fCrée par &c&n{plugin_author}"
+      - ""
+
+    no_param_footer:
+      - "*---------------------------------------------------*"
+
+    help_link:
+      message: "&f&nClique pour voir les sous-commandes disponibles."
+      on_hover:
+       - "&a&bClique pour voir les commandes disponibles."
+      on_run_cmd: "/zticket admin ?"
+
+  GiveOrUseCommand:
+    ticket_not_exist: "Le ticket {ticket_id} &c n'existe pas, exécutez &a/zticket admin list&c."
+    give:
+      sender: "&fVous venez de donner &bx{amount} ticket(s) [{ticket_id} - {ticket_name}&b] &fà &b{receiver_player}&f."
+      receiver: "&fVous venez de recevoir &bx{amount} ticket(s) [{ticket_id} - {ticket_name}&b] &fde &b{sender_player}&f."
+    use:
+      sender: "&fVous venez d'utiliser &bx{amount} ticket(s) [{ticket_id} - {ticket_name}&b] &fà &b{receiver_player}&f."
+      receiver: "&b{sender_player} &fviens de vous utilisez &bx{amount} ticket(s) [{ticket_id} - {ticket_name}&b]&f."
+
+  ListCommand:
+    header:
+      - "*---------------------------------------------------*"
+    footer:
+      - "*---------------------------------------------------*"
+    line: "- {ticket_id} - {ticket_name}"
+
+  HelpCommand:
+    header:
+      - "*---------------------------------------------------*"
+      - "<center>&cCommandes admin disponibles"
+      - ""
+      - " &6[] &f- Arguments Requis"
+      - " &6<> &f- Arguments Optionnels"
+      - ""
+
+    footer:
+      - "*---------------------------------------------------*"
+
+    commands:
+      - param: "&fhelp"
+        permission: "zticket.admin.help"
+        hover: [ "&f- &cAffiche &fla liste des commandes admin disponible." ]
+
+      - param: "&flist"
+        permission: "zticket.admin.list"
+        hover: [ "&f- &cAffiche &fla liste des tickets existent." ]
+
+      - param: "&fgive &6[player] &6[ticket_id] &6[amount]"
+        permission: "zticket.admin.give"
+        hover: [ "&f- &cDonner &fle nombre de ticket choisie au joueur." ]
+
+      - param: "&fuse &6[player] &6[ticket_id] &6[amount]"
+        permission: "zticket.admin.use"
+        hover: [ "&f- &cUtiliser &fle nombre de ticket choisie au joueur." ]

@@ -1,6 +1,6 @@
-package net.eaglemc.eagleduel.plugin.util;
+package net.maliimaloo.ztickets.plugin.util;
 
-import net.eaglemc.eagleduel.plugin.settings.Settings;
+import net.maliimaloo.ztickets.plugin.settings.Settings;
 import org.bukkit.entity.Player;
 import org.mineacademy.fo.Common;
 import org.mineacademy.fo.Valid;
@@ -12,7 +12,7 @@ import java.util.Objects;
 
 @SuppressWarnings("unused")
 public final class CommandUtils {
-    private static final String prefix = Settings.PLUGIN_PREFIX + " ";
+    private static final String prefix = Settings.getPluginPrefix();
 
     /**
      * Crée un composant de commande avec une sous-commande et un message d'information au survol.
@@ -49,7 +49,7 @@ public final class CommandUtils {
     public static void createCommandComponent(SimpleComponent paramCommandComponent, String paramCurrentLabel, Player paramPlayer, String paramSubcommand, String paramValueSubcommand, List<String> paramHoverList, String paramPermission, String paramAction) {
         paramSubcommand = (Valid.isNullOrEmpty(paramSubcommand) ? "" : " &c&n" + paramSubcommand);
         paramCommandComponent
-                .append("\n" + prefix + "/" + paramCurrentLabel + paramSubcommand + "&r " + paramValueSubcommand)
+                .append("/" + paramCurrentLabel + paramSubcommand + "&r " + paramValueSubcommand)
                 .onHover(generateHover(paramPlayer, paramHoverList, paramPermission, paramAction));
 
         String paramCommandString = "/" + paramCurrentLabel + paramSubcommand;

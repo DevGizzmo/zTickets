@@ -1,0 +1,32 @@
+name: ${project.name}
+version: ${project.version}
+main: ${main.class.bukkit}
+author: ${author}
+api-version: 1.13
+
+depend: []
+softdepend: []
+
+libraries:
+  # DO NOT EDIT THE FIRST LIBRARY, required to make your plugin work under Java 15+
+  - org.openjdk.nashorn:nashorn-core:15.4
+
+permission:
+  ztickets.admin.*:
+    description: Access to all admin commands.
+    children:
+      ztickets.admin.use: true
+      ztickets.admin.give: true
+      ztickets.admin.list: true
+      ztickets.admin.help: true
+
+  ztickets.command.admin:
+    description: Access to commands admin.
+  ztickets.admin.use:
+    description: Access to use admin command.
+  ztickets.admin.give:
+    description: Access to give admin command.
+  ztickets.admin.list:
+    description: Access to list admin command.
+  ztickets.admin.help:
+    description: Access to help admin command.

@@ -103,8 +103,8 @@ Tickets:
         1:
           type: 'command'
           chance: 40
-          command: 'eco give %player% 1'
-          message_receive: '&fVous avez gagner &a1$&f.'
+          command: 'eco give %player% 1000'
+          message_receive: '&fVous avez gagner &a1000$&f.'
 
         2:
           type: 'item'
@@ -149,17 +149,17 @@ Tickets:
 
     Rewards:
       Rewards_Constant:
-        - 'eco give 1 %player%'
-        - 'give 1 %player% 64'
+        - 'eco give %player% 1'
+        - 'give %player% grass 64'
 
       Amount_Rewards_Chance: 2
 
       Rewards_Chance:
         1:
           type: 'command'
-          command: 'eco give %player% 1'
+          command: 'eco give %player% 10000'
           chance: 40
-          message_receive: '&fVous avez gagner &a1$&f.'
+          message_receive: '&fVous avez gagner &a10000$&f.'
 
         2:
           type: 'item'

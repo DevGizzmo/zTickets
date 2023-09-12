@@ -2,42 +2,40 @@ package net.maliimaloo.ztickets.plugin.commands.admin;
 
 import net.maliimaloo.ztickets.plugin.ZTickets;
 import net.maliimaloo.ztickets.plugin.model.TicketCreator;
+import net.maliimaloo.ztickets.plugin.settings.Localization;
 import net.maliimaloo.ztickets.plugin.util.CommandUtils;
 import net.maliimaloo.ztickets.plugin.util.Utils;
 import org.bukkit.entity.Player;
-import org.mineacademy.fo.Common;
 import org.mineacademy.fo.Messenger;
 import org.mineacademy.fo.PlayerUtil;
+import org.mineacademy.fo.Valid;
+import org.mineacademy.fo.command.ReloadCommand;
 import org.mineacademy.fo.command.SimpleSubCommand;
 import org.mineacademy.fo.model.SimpleComponent;
+import org.mineacademy.fo.plugin.SimplePlugin;
+import org.mineacademy.fo.settings.SimpleLocalization;
+import org.mineacademy.fo.settings.YamlConfig;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.io.File;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class AdminCommand extends SimpleSubCommand {
-    private final ZTickets plugin;
+public class ZAdminCommand extends SimpleSubCommand {
+    private final ZTickets plugin = ZTickets.getInstance();
 
-    public AdminCommand(ZTickets plugin) {
+    public ZAdminCommand() {
         super("admin");
 
         super.setAutoHandleHelp(false);
-        super.setMinArguments(1);
-
-        this.plugin = plugin;
+        super.setPermission("ztickets.command.admin");
     }
 
     @Override
     protected void onCommand() {
-        Common.log("Arguments Size: " + super.args.length);
-        for (int i = 0; i < super.args.length; i++) {
-            Common.log(i + ":" + super.args[i]);
-        }
-
-        final Param param = Param.find(super.args[0]);
+        final Param param = Param.find(args[0]);
         if (param == null) {
-            super.returnInvalidArgs();
+            returnInvalidArgs();
             return;
         }
 
@@ -47,154 +45,190 @@ public class AdminCommand extends SimpleSubCommand {
                 break;
 
             case GIVE:
-                this.handleGiveCommand();
+                this.handleGiveOrUseCommand(true);
                 break;
 
             case USE:
-                this.handleUseCommand();
+                this.handleGiveOrUseCommand(false);
                 break;
 
             case LIST:
-                List<String> listMsg = new ArrayList<>();
+                this.handleListCommand();
+                break;
 
-                listMsg.add(Common.chatLine());
-                this.plugin.getTicketStorage().getCache().forEach((ticketCreator) -> listMsg.add(" - Id: " + ticketCreator.getUniqueId()));
-                listMsg.add(Common.chatLine());
-
-                super.tell(listMsg);
+            case RELOAD:
+                this.handleReloadCommand();
                 break;
         }
     }
 
-    private void handleGiveCommand() {
-        if (!Utils.hasPermission(super.getSender(), "zticket.admin.give")) {
-            super.tellError("Vous n'avez pas la permission d'utiliser cette commandes.");
+    private void handleGiveOrUseCommand(boolean isGiveCommand) {
+        final String permission = isGiveCommand ? "ztickets.admin.give" : "ztickets.admin.use";
+        if (!Utils.hasPermission(getSender(), permission)) {
+            super.tellError(Localization.getNoPermission("permission", permission));
+            return;
+        }
+
+        if (super.args.length < 4) {
+            super.returnInvalidArgs();
+            return;
+        }
+
+        final String receiverName = super.args[1];
+        final Player receiver = PlayerUtil.getPlayerByNick(receiverName, true);
+        if (receiver == null) {
+            super.tellError(Localization.getPlayerNotOnline("target_player", receiverName));
+            return;
+        }
+
+        final int uniqueId;
+        if (!Valid.isNumber(super.args[2])) {
+            super.tellError(Localization.getInvalidNumber("input", super.args[2]));
+            return;
         } else {
-            final String receiverName = super.args[1];
-            final String uniqueId = super.args[2];
+            uniqueId = Integer.parseInt(super.args[2]);
+        }
 
-            final int amount;
-            try {
-                amount = Integer.parseInt(super.args[3]);
-            } catch (NumberFormatException exception) {
-                super.tellError("La quantité doit être un nombre valide.");
-                return;
-            }
+        if (!this.plugin.getTicketManager().isExists(uniqueId)) {
+            super.tellError(Localization.GiveOrUseCommand.getTicketNotExist("ticket_id", uniqueId));
+            return;
+        }
 
-            final Player receiver = PlayerUtil.getPlayerByNick(receiverName, true);
-            if (receiver == null) {
-                super.tellError("Le joueur cible n'est pas en ligne.");
-                return;
-            }
+        final int amount;
+        if (!Valid.isNumber(super.args[3])) {
+            super.tellError(Localization.getInvalidNumber("input", super.args[3]));
+            return;
+        } else {
+            amount = Integer.parseInt(super.args[3]);
+        }
 
-            if (!this.plugin.getTicketStorage().isExists(uniqueId)) {
-                super.tellError("Le ticket &b" + uniqueId + " &cn'existe pas, execute &a/zticket admin list&c.");
-                return;
-            }
 
-            TicketCreator ticket = this.plugin.getTicketStorage().getTicket(uniqueId);
+        TicketCreator ticket = this.plugin.getTicketManager().getTicket(uniqueId);
+        if (isGiveCommand) {
             PlayerUtil.addItems(receiver.getInventory(), ticket.toItemStack(amount));
 
-            super.tellSuccess("&fVous venez de recevoir " + amount + " ticket(s) &b" + ticket.getUniqueId() + "&f.");
+            super.tellSuccess(Localization.GiveOrUseCommand.getGiveSender("amount", amount, "ticket_id", ticket.getUniqueId(), "ticket_name", ticket.getName(), "receiver_player", receiver.getName(), "sender_player", super.getPlayer().getName()));
+            Messenger.success(receiver,Localization.GiveOrUseCommand.getGiveReceiver("amount", amount, "ticket_id", ticket.getUniqueId(), "ticket_name", ticket.getName(), "receiver_player", receiver.getName(), "sender_player", super.getPlayer().getName()));
+        } else {
+            this.plugin.getTicketManager().use(receiver, ticket, true, amount);
+
+            super.tellSuccess(Localization.GiveOrUseCommand.getUseSender("amount", amount, "ticket_id", ticket.getUniqueId(), "ticket_name", ticket.getName(), "receiver_player", receiver.getName(), "sender_player", super.getPlayer().getName()));
+            Messenger.success(receiver,Localization.GiveOrUseCommand.getUseReceiver("amount", amount, "ticket_id", ticket.getUniqueId(), "ticket_name", ticket.getName(), "receiver_player", receiver.getName(), "sender_player", super.getPlayer().getName()));
         }
     }
 
-    private void handleUseCommand() {
-        if (!Utils.hasPermission(super.getSender(), "zticket.admin.use")) {
-            super.tellError("Vous n'avez pas la permission d'utiliser cette commande.");
+    private void handleListCommand() {
+        final String permission = "ztickets.admin.list";
+        if (!Utils.hasPermission(getSender(), permission)) {
+            super.tellError(Localization.getNoPermission("permission", permission));
         } else {
-            final String receiverName = super.args[1];
-            final String uniqueId = super.args[2];
+            List<String> message = new ArrayList<>(Localization.ListCommand.getHeader());
 
-            final int amount;
-            try {
-                amount = Integer.parseInt(super.args[3]);
-            } catch (NumberFormatException exception) {
-                super.tellError("La quantité doit être un nombre valide.");
-                return;
-            }
+            new ArrayList<>(this.plugin.getTicketManager().getCache()).stream()
+                    .sorted(Comparator.comparingInt(TicketCreator::getUniqueId))
+                    .collect(Collectors.toList())
+                    .forEach((ticket) -> message.add(Localization.ListCommand.getLine("ticket_id", ticket.getUniqueId(), "ticket_name", ticket.getName())));
 
-            final Player receiver = PlayerUtil.getPlayerByNick(receiverName, true);
-            if (receiver == null) {
-                super.tellError("Le joueur cible n'est pas en ligne.");
-                return;
-            }
-
-            if (!this.plugin.getTicketStorage().isExists(uniqueId)) {
-                super.tellError("Le ticket &b" + uniqueId + " &cn'existe pas, execute &a/zticket admin list&c.");
-                return;
-            }
-
-            TicketCreator ticket = this.plugin.getTicketStorage().getTicket(uniqueId);
-            ticket.use(receiver, true, amount);
-
-            super.tellSuccess("&fVous venez d'ouvrir &ax" + amount + " " + ticket.getName() + " &fa &a" + receiverName + "&f.");
-            Messenger.success(receiver, "&a" + super.getSender().getName() + " &fviens de vous ouvrir &ax" + amount + " " + ticket.getName() + "&f.");
+            message.addAll(Localization.ListCommand.getFooter());
+            super.tell(message);
         }
     }
 
     private void handleHelpCommand() {
-        if (!Utils.hasPermission(super.getSender(), "zticket.admin.help")) {
-            super.tellError("Vous n'avez pas la permission d'utiliser cette commande.");
-        } else {
-            List<SimpleComponent> helpComponents = new ArrayList<>();
+        final String permission = "ztickets.admin.help";
+        if (!Utils.hasPermission(getSender(), permission)) {
+            super.tellError(Localization.getNoPermission("permission", permission));
+            return;
+        }
 
-            this.addEmptyChatLine(helpComponents);
+        List<SimpleComponent> helpComponents = new ArrayList<>();
 
-            this.addTitle(helpComponents, "commandes admin disponibles");
+        this.addHeaderComponent(helpComponents);
+        this.addCommandsComponent(helpComponents);
+        this.addFooterComponent(helpComponents);
 
-            this.addEmptyLine(helpComponents);
+        super.tell(helpComponents);
+    }
 
-            this.addArgumentLegends(helpComponents);
+    private void handleReloadCommand() {
+        final String permission = "ztickets.admin.reload";
+        if (!Utils.hasPermission(super.getSender(), permission)) {
+            super.tellError(Localization.getNoPermission("permission", permission));
+            return;
+        }
 
-            this.addEmptyLine(helpComponents);
+        try {
+            super.tellSuccess(SimpleLocalization.Commands.RELOAD_STARTED);
+            boolean syntaxParsed = true;
+            List<File> yamlFiles = new ArrayList<>();
+            this.collectYamlFiles(SimplePlugin.getData(), yamlFiles);
 
-            this.addCommandComponent(helpComponents);
+            for (File file : yamlFiles) {
+                try {
+                    YamlConfig.fromFile(file);
+                } catch (Throwable var6) {
+                    var6.printStackTrace();
+                    syntaxParsed = false;
+                }
+            }
 
-            this.addEmptyLine(helpComponents);
+            if (!syntaxParsed) {
+                super.tellError(SimpleLocalization.Commands.RELOAD_FILE_LOAD_ERROR);
+                return;
+            }
 
-            this.addHoverInstructions(helpComponents);
-
-            this.addEmptyChatLine(helpComponents);
-
-            super.tell(helpComponents);
+            SimplePlugin.getInstance().reload();
+            super.tellSuccess(SimpleLocalization.Commands.RELOAD_SUCCESS);
+        } catch (Throwable var7) {
+            super.tellError(SimpleLocalization.Commands.RELOAD_FAIL.replace("{error}", var7.getMessage() != null ? var7.getMessage() : "unknown"));
+            var7.printStackTrace();
         }
     }
 
-    private void addEmptyLine(List<SimpleComponent> components) {
-        components.add(SimpleComponent.of(" "));
+    private void addHeaderComponent(List<SimpleComponent> components) {
+        Localization.HelpCommand.getHeader()
+                .forEach((line) -> components.add(SimpleComponent.of(line)));
     }
 
-    private void addEmptyChatLine(List<SimpleComponent> components) {
-        components.add(SimpleComponent.of(Common.chatLine()));
+    private void addFooterComponent(List<SimpleComponent> components) {
+        Localization.HelpCommand.getFooter()
+                .forEach((line) -> components.add(SimpleComponent.of(line)));
     }
 
-    private void addTitle(List<SimpleComponent> components, String title) {
-        components.add(SimpleComponent.of("&c" + title));
+    private void addCommandsComponent(List<SimpleComponent> components) {
+        Localization.HelpCommand.getHelpData()
+                .forEach((helpData) -> {
+                    SimpleComponent commandComponent = SimpleComponent.empty();
+
+                    CommandUtils.createCommandComponent(commandComponent, "&f" + super.getCurrentLabel() + " " + super.getSublabel(), super.getPlayer(), helpData.getParam(), "", helpData.getHover(), helpData.getPermission(), CommandUtils.Action.SUGGEST_COMMAND.getHover());
+                    components.add(commandComponent);
+                }
+        );
     }
 
-    private void addArgumentLegends(List<SimpleComponent> components) {
-        components.add(SimpleComponent.of(" "));
-        components.add(SimpleComponent.of("&6[] &f- Arguments Requis"));
-        components.add(SimpleComponent.of("&6<> &f- Arguments Optionnels"));
-        components.add(SimpleComponent.of(" "));
-    }
+    private List<File> collectYamlFiles(File directory, List<File> list) {
+        if (directory.exists()) {
+            File[] var3 = directory.listFiles();
+            for (File file : var3) {
+                if (file.getName().endsWith("yml")) {
+                    list.add(file);
+                }
 
-    private void addCommandComponent(List<SimpleComponent> components) {
-        SimpleComponent commandComponent = SimpleComponent.empty();
-        CommandUtils.createCommandComponent(commandComponent, "&f" + super.getCurrentLabel() + " " + super.getSublabel(), super.getPlayer(), "help", "", Collections.singletonList("&f- &cAfficher &fla liste des commandes disponibles."), "zticket.admin.help", CommandUtils.Action.SUGGEST_COMMAND.getHover());
-        components.add(commandComponent);
-    }
+                if (file.isDirectory()) {
+                    this.collectYamlFiles(file, list);
+                }
+            }
+        }
 
-    private void addHoverInstructions(List<SimpleComponent> components) {
-        components.add(SimpleComponent.of("&f&nSurvolez la commande pour plus d'informations."));
+        return list;
     }
 
     private enum Param {
-        HELP ("help", "h", "?"),
-        GIVE ("give", "g"),
-        USE ("use", "u"),
-        LIST("list", "l");
+        HELP("help", "h", "?"),
+        GIVE("give", "g"),
+        USE("use", "u"),
+        LIST("list", "l"),
+        RELOAD("reload", "rl");
 
         private final String label;
         private final String[] aliases;
@@ -204,12 +238,6 @@ public class AdminCommand extends SimpleSubCommand {
             this.aliases = paramAliases;
         }
 
-        /**
-         * Trouve un paramètre à partir de l'argument donné.
-         *
-         * @param paramArgument L'argument de la sous-commande.
-         * @return Le Param correspondant ou null si non trouvé.
-         */
         @Nullable
         private static Param find(String paramArgument) {
             String finalParamArgument = paramArgument.toLowerCase();

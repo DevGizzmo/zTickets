@@ -1,5 +1,9 @@
-package net.maliimaloo.ztickets.plugin.model;
+package net.maliimaloo.ztickets.plugin.menu;
 
+import net.maliimaloo.ztickets.plugin.ZTickets;
+import net.maliimaloo.ztickets.plugin.model.MenuItemCreator;
+import net.maliimaloo.ztickets.plugin.model.TicketCreator;
+import net.maliimaloo.ztickets.plugin.settings.SettingsGUIConfirm;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -16,12 +20,17 @@ public class GUIConfirm extends Menu {
     private final Button cancelButton;
 
     public GUIConfirm(ItemStack ticketIStack) {
-        super.setTitle("Confirmation");
-        super.setSize(9 * 3);
+        final String title = SettingsGUIConfirm.getTITLE();
+        final int row = SettingsGUIConfirm.getROW();
+
+        super.setTitle(title);
+        super.setSize(9 * row);
 
         this.confirmButton = new Button() {
             @Override
             public void onClickedInMenu(Player player, Menu menu, ClickType clickType) {
+                final ZTickets plugin = ZTickets.getInstance();
+
                 TicketCreator ticket = TicketCreator.fromItemStack(ticketIStack);
                 if (ticket == null) {
                     player.closeInventory();
@@ -29,15 +38,18 @@ public class GUIConfirm extends Menu {
                     return;
                 }
 
-                ticket.use(player);
+                if (clickType.isRightClick()) {
+                    plugin.getTicketManager().use(player, ticket, false, ticketIStack.getAmount());
+                } else {
+                    plugin.getTicketManager().use(player, ticket);
+                }
+
                 player.closeInventory();
             }
 
             @Override
             public ItemStack getItem() {
-                return ItemCreator.of(CompMaterial.GREEN_WOOL).name("&aConfirmation !").lore(Arrays.asList(
-                        " ", "&aClique &fpour &aconfirmer &fl'utilisation du ticket !"
-                )).make();
+                return SettingsGUIConfirm.ImmutableContent.getCONFIRM_ITEM().toItemStack(null);
             }
         };
 
@@ -49,23 +61,29 @@ public class GUIConfirm extends Menu {
 
             @Override
             public ItemStack getItem() {
-                return ItemCreator.of(CompMaterial.RED_WOOL).name("&cAnnulation !").lore(Arrays.asList(
-                        " ", "&cClique &fpour &cannuler &fl'utilisation du ticket !"
-                )).make();
+                return SettingsGUIConfirm.ImmutableContent.getCANCEL_ITEM().toItemStack(null);
             }
         };
     }
 
     @Override
     public ItemStack getItemAt(int slot) {
-        if (slot == 9 + 3 || slot == 9 + 2 || slot == 9 + 1) {
+        slot += 1;
+
+        if (SettingsGUIConfirm.ImmutableContent.getCONFIRM_ITEM().getSlots().contains(slot)) {
             return this.confirmButton.getItem();
         }
 
-        if (slot == 9 + 5 || slot == 9 + 6 || slot == 9 + 7) {
+        if (SettingsGUIConfirm.ImmutableContent.getCANCEL_ITEM().getSlots().contains(slot)) {
             return this.cancelButton.getItem();
         }
 
-        return ItemCreator.of(CompMaterial.PURPLE_STAINED_GLASS_PANE).name(" ").lore(" ").glow(true).make();
+        for (MenuItemCreator menuItemContent : SettingsGUIConfirm.Content.getContents()) {
+            if (menuItemContent.getSlots().contains(slot)) {
+                return menuItemContent.toItemStack(null);
+            }
+        }
+
+        return null;
     }
 }

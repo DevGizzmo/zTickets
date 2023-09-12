@@ -1,0 +1,128 @@
+# ---------------------------------------------
+# Ne pas modifier la valeur de Version.
+# ---------------------------------------------
+Version: 1
+
+# ---------------------------------------------
+# Titre afficher du menu
+# ---------------------------------------------
+Title: '&aConfirmation'
+
+# ---------------------------------------------
+# Taille du menu
+# ---------------------------------------------
+Row: 3
+
+Contents:
+  # ---------------------------------------------
+  # La liste des items qui ne sont pas supprimables.
+  # ---------------------------------------------
+  Immutable_Content:
+    Confirm:
+      # ----------------------------------------------------
+      # Le nom de l'item afficher
+      # ----------------------------------------------------
+      name: '&aConfirmation !'
+
+      # ----------------------------------------------------
+      # Le type d'objet à afficher
+      #
+      # Pour une tête de joueur, veuillez mettre 'SKULL-<OWNER>'
+      # Pour une tête via HeadDatabase, veuillez mettre 'HDB-<ID>'
+      # ----------------------------------------------------
+      material: 'GREEN_WOOL'
+
+      # ----------------------------------------------------
+      # Un effet d'enchantement doit-il être mis sur l'item ?
+      # ----------------------------------------------------
+      glow: false
+
+      # ----------------------------------------------------
+      # L'id du model data que vous souhaitez
+      # ----------------------------------------------------
+      modelData: 0
+
+      # ----------------------------------------------------
+      # La description afficher de l'item
+      # ----------------------------------------------------
+      lore:
+        - ''
+        - '&aClique &fpour &aconfirmer &fl''utilisation du ticket !'
+
+      # ----------------------------------------------------
+      # Liste des slots où seront affiché les objets
+      # ----------------------------------------------------
+      slots:
+        - '3'
+
+    Cancel:
+      # ----------------------------------------------------
+      # Le nom de l'item afficher
+      # ----------------------------------------------------
+      name: '&cAnnulation !'
+
+      # ----------------------------------------------------
+      # Le type d'objet à afficher
+      #
+      # Pour une tête de joueur, veuillez mettre 'SKULL-<OWNER>'
+      # Pour une tête via HeadDatabase, veuillez mettre 'HDB-<ID>'
+      # ----------------------------------------------------
+      material: 'RED_WOOL'
+
+      # ----------------------------------------------------
+      # L'id du model data que vous souhaitez
+      # ----------------------------------------------------
+      modelData: 0
+
+      # ----------------------------------------------------
+      # Un effet d'enchantement doit-il être mis sur l'item ?
+      # ----------------------------------------------------
+      glow: false
+
+      # ----------------------------------------------------
+      # La description afficher de l'item
+      # ----------------------------------------------------
+      lore:
+        - ''
+        - '&aClique &fpour &aannuler &fl''utilisation du ticket !'
+
+      # ----------------------------------------------------
+      # Liste des slots où seront affiché les objets
+      # ----------------------------------------------------
+      slots:
+        - '6'
+
+  Content:
+    1:
+      name: ' '
+      material: 'PURPLE_STAINED_GLASS_PANE'
+      modelData: 0
+      glow: true
+      lore:
+        - ''
+      slots:
+        - '1'
+        - '2'
+        - '4'
+        - '5'
+        - '7'
+        - '8'
+        - '9'
+
+    2:
+      name: ' '
+      material: 'BLUE_STAINED_GLASS_PANE'
+      modelData: 0
+      glow: true
+      lore:
+        - ''
+      slots:
+        - '10'
+        - '11'
+        - '12'
+        - '13'
+        - '14'
+        - '15'
+        - '16'
+        - '17'
+        - '18'

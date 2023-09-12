@@ -3,94 +3,98 @@ package net.maliimaloo.ztickets.plugin.settings;
 import lombok.Getter;
 import net.maliimaloo.ztickets.plugin.model.RewardData;
 import net.maliimaloo.ztickets.plugin.model.TicketCreator;
+import org.mineacademy.fo.Common;
+import org.mineacademy.fo.Valid;
 import org.mineacademy.fo.collection.SerializedMap;
 import org.mineacademy.fo.model.SimpleSound;
 import org.mineacademy.fo.remain.CompSound;
-import org.mineacademy.fo.settings.YamlConfig;
+import org.mineacademy.fo.settings.YamlStaticConfig;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Getter
-public final class TicketStorage extends YamlConfig {
-    @Getter
-    private final static TicketStorage instance = new TicketStorage();
-
-    private final Set<TicketCreator> cache = new HashSet<>();
-
-    private TicketStorage() {
-        super.loadConfiguration("tickets.yml", "tickets.yml");
-    }
+public final class SettingsTicket extends YamlStaticConfig {
+    @Getter private static final Set<TicketCreator> cache = new HashSet<>();
 
     @Override
     protected void onLoad() {
-        super.setPathPrefix(null);
+        super.loadConfiguration("tickets/tickets.yml");
+    }
 
-        SerializedMap sectionTickets = super.getMap("Tickets");
-        sectionTickets.forEach((uniqueId, value) -> {
-            super.setPathPrefix("Tickets." + uniqueId);
+    private static void init() {
+        SettingsTicket.setPathPrefix(null);
 
+        SerializedMap sectionTickets = SettingsTicket.getMap("Tickets");
+        sectionTickets.forEach((key, value) -> {
+            SettingsTicket.setPathPrefix("Tickets." + key);
+            if (!Valid.isNumber(key)) {
+                Common.throwError(new YAMLException("L'uniqueId: " + key + ", doit être un nombre valide."));
+                return;
+            }
+
+            final int uniqueId = Integer.parseInt(key);
             TicketCreator.Builder ticketCreatorBuilder = TicketCreator.of(uniqueId);
-            if (super.isSet("Name")) {
-                ticketCreatorBuilder.setName(super.getString("Name"));
+            if (SettingsTicket.isSet("Name")) {
+                ticketCreatorBuilder.setName(SettingsTicket.getString("Name"));
             }
 
-            if (super.isSet("Material")) {
-                ticketCreatorBuilder.setMaterial(super.getString("Material"));
+            if (SettingsTicket.isSet("Material")) {
+                ticketCreatorBuilder.setMaterial(SettingsTicket.getString("Material"));
             }
 
-            if (super.isSet("ModelData")) {
-                ticketCreatorBuilder.setModelData(super.getInteger("ModelData"));
+            if (SettingsTicket.isSet("ModelData")) {
+                ticketCreatorBuilder.setModelData(SettingsTicket.getInteger("ModelData"));
             }
 
-            if (super.isSet("Glow")) {
-                ticketCreatorBuilder.setGlow(super.getBoolean("Glow"));
+            if (SettingsTicket.isSet("Glow")) {
+                ticketCreatorBuilder.setGlow(SettingsTicket.getBoolean("Glow"));
             }
 
-            if (super.isSet("Lore")) {
-                ticketCreatorBuilder.setLore(super.getStringList("Lore"));
+            if (SettingsTicket.isSet("Lore")) {
+                ticketCreatorBuilder.setLore(SettingsTicket.getStringList("Lore"));
             }
 
-            if (super.isSet("Permission")) {
-                ticketCreatorBuilder.setPermission(super.getString("Permission"));
+            if (SettingsTicket.isSet("Permission")) {
+                ticketCreatorBuilder.setPermission(SettingsTicket.getString("Permission"));
             }
 
-            if (super.isSet("Title_Use")) {
-                super.setPathPrefix("Tickets." + uniqueId + ".Title_Use");
+            if (SettingsTicket.isSet("Title_Use")) {
+                SettingsTicket.setPathPrefix("Tickets." + key + ".Title_Use");
 
-                if (super.isSet("Title")) {
-                    ticketCreatorBuilder.setTitle(super.getString("Title"));
+                if (SettingsTicket.isSet("Title")) {
+                    ticketCreatorBuilder.setTitle(SettingsTicket.getString("Title"));
                 }
 
-                if (super.isSet("Sub_Title")) {
-                    ticketCreatorBuilder.setSubTitle(super.getString("Sub_Title"));
+                if (SettingsTicket.isSet("Sub_Title")) {
+                    ticketCreatorBuilder.setSubTitle(SettingsTicket.getString("Sub_Title"));
                 }
 
-                if (super.isSet("Fade_In")) {
-                    ticketCreatorBuilder.setFadeIn(super.getInteger("Fade_In"));
+                if (SettingsTicket.isSet("Fade_In")) {
+                    ticketCreatorBuilder.setFadeIn(SettingsTicket.getInteger("Fade_In"));
                 }
 
-                if (super.isSet("Stay")) {
-                    ticketCreatorBuilder.setStay(super.getInteger("Stay"));
+                if (SettingsTicket.isSet("Stay")) {
+                    ticketCreatorBuilder.setStay(SettingsTicket.getInteger("Stay"));
                 }
 
-                if (super.isSet("Fade_Out")) {
-                    ticketCreatorBuilder.setFadeOut(super.getInteger("Fade_Out"));
+                if (SettingsTicket.isSet("Fade_Out")) {
+                    ticketCreatorBuilder.setFadeOut(SettingsTicket.getInteger("Fade_Out"));
                 }
             }
 
-            super.setPathPrefix("Tickets." + uniqueId);
+            SettingsTicket.setPathPrefix("Tickets." + key);
 
-            if (super.isSet("Sound_Use")) {
-                SerializedMap sectionSound = super.getMap("Sound_Use");
+            if (SettingsTicket.isSet("Sound_Use")) {
+                SerializedMap sectionSound = SettingsTicket.getMap("Sound_Use");
                 sectionSound.forEach((soundKey, soundValue) -> {
-                    super.setPathPrefix("Tickets." + uniqueId + ".Sound_Use." + soundKey);
+                    SettingsTicket.setPathPrefix("Tickets." + key + ".Sound_Use." + soundKey);
 
-                    if (!"NONE".equals(super.getString("Name"))) {
-                        CompSound compSound = CompSound.fromName(super.getString("Name"));
-                        final float volume = super.get("Volume", Float.class);
+                    if (!"NONE".equals(SettingsTicket.getString("Name"))) {
+                        CompSound compSound = CompSound.fromName(SettingsTicket.getString("Name"));
+                        final float volume = SettingsTicket.get("Volume", Float.class);
                         if (compSound == null) {
                             compSound = CompSound.CLICK;
                         }
@@ -107,21 +111,21 @@ public final class TicketStorage extends YamlConfig {
                 });
             }
 
-            super.setPathPrefix("Tickets." + uniqueId);
+            SettingsTicket.setPathPrefix("Tickets." + key);
 
-            if (super.isSet("Rewards")) {
-                super.setPathPrefix("Tickets." + uniqueId + ".Rewards");
+            if (SettingsTicket.isSet("Rewards")) {
+                SettingsTicket.setPathPrefix("Tickets." + key + ".Rewards");
 
-                if (super.isSet("Rewards_Constant")) {
-                    ticketCreatorBuilder.setRewardsConstant(super.getStringList("Rewards_Constant"));
+                if (SettingsTicket.isSet("Rewards_Constant")) {
+                    ticketCreatorBuilder.setRewardsConstant(SettingsTicket.getStringList("Rewards_Constant"));
                 }
 
-                if (super.isSet("Amount_Rewards_Chance")) {
-                    ticketCreatorBuilder.setRewardsAmountChance(super.getInteger("Amount_Rewards_Chance"));
+                if (SettingsTicket.isSet("Amount_Rewards_Chance")) {
+                    ticketCreatorBuilder.setRewardsAmountChance(SettingsTicket.getInteger("Amount_Rewards_Chance"));
                 }
 
-                if (super.isSet("Rewards_Chance")) {
-                    SerializedMap rewardChanceMap = super.getMap("Rewards_Chance");
+                if (SettingsTicket.isSet("Rewards_Chance")) {
+                    SerializedMap rewardChanceMap = SettingsTicket.getMap("Rewards_Chance");
 
                     List<RewardData> rewards = new ArrayList<>();
                     rewardChanceMap.forEach((rewardKey, rewardValue) -> {
@@ -134,14 +138,10 @@ public final class TicketStorage extends YamlConfig {
                     ticketCreatorBuilder.setRewardsChance(rewards);
                 }
 
-                super.setPathPrefix("Tickets." + uniqueId + ".Rewards");
+                SettingsTicket.setPathPrefix("Tickets." + key + ".Rewards");
             }
 
-            this.cache.add(ticketCreatorBuilder.build());
+            cache.add(ticketCreatorBuilder.build());
         });
-    }
-
-    @Override
-    protected void onSave() {
     }
 }

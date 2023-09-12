@@ -1,12 +1,14 @@
-package net.eaglemc.eagleduel.plugin.util;
+package net.maliimaloo.ztickets.plugin.util;
 
-import net.eaglemc.eagleduel.plugin.settings.Settings;
+import net.maliimaloo.ztickets.plugin.settings.Settings;
 import org.bukkit.entity.Player;
-import org.mineacademy.fo.*;
+import org.mineacademy.fo.Common;
+import org.mineacademy.fo.Messenger;
+import org.mineacademy.fo.SerializeUtil;
+import org.mineacademy.fo.Valid;
 import org.mineacademy.fo.collection.SerializedMap;
 import org.mineacademy.fo.model.JavaScriptExecutor;
 import org.mineacademy.fo.model.Replacer;
-import org.mineacademy.fo.remain.Remain;
 import org.mineacademy.fo.settings.SimpleLocalization;
 
 import javax.annotation.Nullable;
