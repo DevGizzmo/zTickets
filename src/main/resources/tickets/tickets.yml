@@ -1,0 +1,173 @@
+Tickets:
+  1:
+    # ----------------------------------------------------
+    # Le nom de l'item afficher
+    # ----------------------------------------------------
+    Name: 'Ticket Common !'
+
+    # ----------------------------------------------------
+    # Le type d'objet à afficher
+    #
+    # Pour une tête de joueur, veuillez mettre 'SKULL-<OWNER>'
+    # Pour une tête via HeadDatabase, veuillez mettre 'HDB-<ID>'
+    # Pour un ModelData, veuillez mettre 'MD-<ID>'
+    # ----------------------------------------------------
+    Material: 'PAPER'
+
+    # ----------------------------------------------------
+    # L'id du model-data que vous souhaitez utiliser.
+    # ----------------------------------------------------
+    ModelData: 0
+
+    # ----------------------------------------------------
+    # Un effet d'enchantement doit-il être mis sur l'item ?
+    # ----------------------------------------------------
+    Glow: false
+
+    # ----------------------------------------------------
+    # La description afficher de l'item
+    # ----------------------------------------------------
+    Lore:
+      - 'Voici le ticket'
+      - 'de type Common !'
+
+    # ----------------------------------------------------
+    # La permission nécessaire pour l'utiliser.
+    #
+    # Définir sur "NONE" pour ne pas utiliser cette feature.
+    # ----------------------------------------------------
+    Permission: 'NONE'
+
+    # ----------------------------------------------------
+    # Configuration du title lors de l'utilisation d'un ticket.
+    # ----------------------------------------------------
+    Title_Use:
+      # ----------------------------------------------------
+      # Ceux qui sera afficher à la première ligne du Title.
+      #
+      # Définir sur 'Title: "NONE"' pour ne pas utiliser cette feature.
+      # ----------------------------------------------------
+      Title: 'NONE'
+
+      # ----------------------------------------------------
+      # Ceux qui sera afficher à la seconde ligne du Title.
+      # ----------------------------------------------------
+      Sub_Title: "zTickets Sub_Title !"
+
+      # ----------------------------------------------------
+      # Temps de spawn du title au joueur. (Seconde)
+      # ----------------------------------------------------
+      Fade_In: 10
+
+      # ----------------------------------------------------
+      # Temps que reste spawn le title. (Seconde)
+      # ----------------------------------------------------
+      Stay: 5
+
+      # ----------------------------------------------------
+      # Temps de despawn du title au joueur. (Seconde)
+      # ----------------------------------------------------
+      Fade_Out: 5
+
+    # ----------------------------------------------------
+    # Quelle est le sont à jouer lors de l'utilisation d'un ticket.
+    #
+    # Définir sur 'Name: "NONE"' pour ne pas utiliser cette feature.
+    # ----------------------------------------------------
+    Sound_Use:
+      Success:
+        Name: 'NONE'
+        Volume: 5.0F
+      Failed:
+        Name: 'NONE'
+        Volume: 5.0F
+
+    Rewards:
+      # ----------------------------------------------------
+      # Liste des rewards qui seront obtenus à chaque utilisation.
+      # ----------------------------------------------------
+      Rewards_Constant:
+        - 'eco give %player% 1'
+        - 'give %player% stone 64'
+
+      # ----------------------------------------------------
+      # Le nombre de reward chance obtenu.
+      # ----------------------------------------------------
+      Amount_Rewards_Chance: 2
+
+      # ----------------------------------------------------
+      # Liste des commandes qui auront un pourcentage de chance
+      # d'être obtenu.
+      # ----------------------------------------------------
+      Rewards_Chance:
+        1:
+          type: 'command'
+          chance: 40
+          command: 'eco give %player% 1'
+          message_receive: '&fVous avez gagner &a1$&f.'
+
+        2:
+          type: 'item'
+          chance: 32
+          material: 'wooden_sword'
+          name: 'Epee en bois'
+          lore:
+            - 'Une epee puissante'
+            - 'avec des enchantements'
+          enchantments:
+            - 'DAMAGE_ALL:3'
+            - 'DURABILITY:2'
+          amount: 1
+          message_receive: '&fVous avez gagner &ax1 Epee en bois&f.'
+
+  2:
+    Name: 'Ticket Rare !'
+    Material: 'PAPER'
+    ModelData: 0
+    Glow: true
+
+    Lore:
+      - 'Voici le ticket'
+      - 'de type Rare !'
+
+    Title_Use:
+      Title: "zTickets !"
+      Sub_Title: "zTickets Sub_Title !"
+      Fade_In: 10
+      Stay: 5
+      Fade_Out: 5
+
+    Sound_Use:
+      Success:
+        Name: 'NONE'
+        Volume: 5.0F
+      Failed:
+        Name: 'NONE'
+        Volume: 5.0F
+
+    Permission: 'NONE'
+
+    Rewards:
+      Rewards_Constant:
+        - 'eco give 1 %player%'
+        - 'give 1 %player% 64'
+
+      Amount_Rewards_Chance: 2
+
+      Rewards_Chance:
+        1:
+          type: 'command'
+          command: 'eco give %player% 1'
+          chance: 40
+          message_receive: '&fVous avez gagner &a1$&f.'
+
+        2:
+          type: 'item'
+          chance: 32
+          material: 'wooden_sword'
+          name: 'Epee en bois'
+          lore:
+            - 'Une epee puissante'
+            - 'sans enchantements'
+          amount: 1
+          message_receive: '&fVous avez gagner &ax1 Epee en bois&f.'
