@@ -11,11 +11,11 @@ Player:
   Not_Win_Reward: "&cVous n'avez rien gagner."
 
 Commands:
-  Invalid_Argument: "&cArgument invalide. Exécutez '&6/{label} ?&c' pour l'aide."
+  Invalid_Argument: "&cArgument invalide. Exécutez &6/{label} ? &cpour l'aide."
   Invalid_Number: "&cLe nombre doit être un nombre entier ou un nombre décimal. Obtenu : '&6{input}&c'"
   Reload_Started: "Reloading plugin's data, veuillez attendre..."
   Reload_Success: "&6{plugin_name} {plugin_version} viens de reload."
-  Reload_File_Load_Error: "&4Oups, &cvoici un problème lors du chargement des fichiers à partir de votre disque ! Voir la console pour plus d'informations. {plugin_name} n'a pas été rechargé.";
+  Reload_File_Load_Error: "&4Oups, &cvoici un problème lors du chargement des fichiers à partir de votre disque ! Voir la console pour plus d'informations. {plugin_name} n'a pas été rechargé."
   Reload_Fail: "&4Oups, &céchec du chargement ! Consultez la console pour plus d'informations. Erreur : {error}"
 
   MainCommand:
